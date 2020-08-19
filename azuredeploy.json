@@ -425,7 +425,7 @@
           ]
         },
         "protectedSettings": {
-          "commandToExecute": "[concat('bash ', variables('cp-all-in-oneInstallScriptName'), ' -c ', copyindex(), ' -d ', parameters('dnsLabelForVmIp'), ' -u ', parameters('vmAdminUsername'), if(empty(parameters('workspaceName')), '', concat(' -w ', reference(variables('solaceWorkspaceName')).outputs.workspaceId.value)))]"
+          "commandToExecute": "[concat('bash ', variables('cp-all-in-oneInstallScriptName'), ' -l ',  parameters('location'), '-u ', parameters('vmAdminUsername'), if(empty(parameters('workspaceName')), '', concat(' -w ', reference(variables('solaceWorkspaceName')).outputs.workspaceId.value)))]"
          }
       }
     }
