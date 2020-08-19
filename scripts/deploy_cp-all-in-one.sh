@@ -132,7 +132,7 @@ echo "`date` INFO: Start the cp-all-in-one containers"
 #systemctl start cp-all-in-one
 
 cd /tmp/cp-all-in-one/cp-all-in-one/
-docker-compose.yml up -d
+docker-compose up -d
 
 echo "`date` INFO: Fixing advertised listeners"
 
