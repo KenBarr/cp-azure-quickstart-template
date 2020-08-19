@@ -29,19 +29,16 @@
 OPTIND=1         # Reset in case getopts has been used previously in the shell.
 
 # Initialize our own variables:
-current_index=""
-dns_prefix=""
+location="eastus"
 username="admin"
 workspace_id=""
 is_primary="false"
 
-while getopts "c:d:u:w:" opt; do
+while getopts "l:u:w:" opt; do
   case "$opt" in
-  c)  current_index=$OPTARG
+  l)  location=$OPTARG
     ;;
-  d)  dns_prefix=$OPTARG
-    ;;
-  u)  username= $OPTARG
+  u)  username=$OPTARG
     ;;
   w)  workspace_id=$OPTARG
     ;;
@@ -51,7 +48,7 @@ done
 shift $((OPTIND-1))
 [ "$1" = "--" ] && shift
 
-echo "`date` current_index=$current_index , dns_prefix=$dns_prefix , username=$username , workspace_id=$workspace_id  , Leftovers: $@"
+echo "`date` location=$location , username=$username , workspace_id=$workspace_id  , Leftovers: $@"
 
 #Install the git jq for json parsing
 yum -y install git jq
@@ -135,6 +132,21 @@ systemctl enable cp-all-in-one
 systemctl start cp-all-in-one
 
 echo "`date` INFO: Fixing advertised listeners"
-docker exec broker "sed" "-i" "s/localhost/${dns_prefix}${current_index}/" "/etc/kafka/kafka.properties"
+
+broker_running=""
+loop_guard=10
+loop_count=0
+while [ ${loop_count} != ${loop_guard} ]; do
+  broker_running=`docker ps -f name=broker | grep -o broker`
+  if [ ${broker_running} != "broker" ]; then
+    ((loop_count++))
+    echo "`date` WARN: Tried to launch cp-all-in-one but Broker not yet up"
+    sleep 30
+  else
+    echo "`date` INFO: Kafka Broker is running"
+    docker exec broker "sed" "-i" "s/localhost/${HOSTNAME},${HOSTNAME}.${location}.cloudapp.azure.com/" "/etc/kafka/kafka.properties"
+    break
+  fi
+done
 
 echo "`date` INFO: cp-all-in-one bringup complete"
