@@ -80,15 +80,15 @@
     },
     "diskSize": {
       "type": "string",
-      "defaultValue": "20",
+      "defaultValue": "30",
       "metadata": {
-        "description": "The size of the data disk in GB for event retension. Allowed values: 20, 40, 80, 160"
+        "description": "The size of the data disk in GB for event retension. Allowed values: 30, 60, 120, 240"
       },
       "allowedValues": [
-        "20",
-        "40",
-        "80",
-        "160"
+        "30",
+        "60",
+        "120",
+        "240"
       ]
     },
     "existingVirtualNetworkName": {
