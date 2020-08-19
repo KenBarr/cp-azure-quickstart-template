@@ -2,10 +2,7 @@
   "$schema": "http://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "solaceEventBrokerDockerImageReference": {
-      "value": "solace/solace-pubsub-standard:latest"
-    },
-    "dataDiskSize": {
+    "diskSize": {
       "value": "20"
     },
     "vmAdminUsername": {
@@ -14,17 +11,11 @@
     "vmAdminPassword": {
       "value": "GEN-PASSWORD"
     },
-    "solaceAdminPassword": {
-      "value": "admin"
-    },
     "workspaceName": {
       "value": "GEN-UNIQUE"
     },
-    "dnsLabelForLbIp": {
+    "dnsLabelForVmIp": {
       "value": "GEN-UNIQUE"
-    },
-    "deploymentModel": {
-      "value": "HighAvailability"
     }
   }
 }

@@ -38,207 +38,90 @@
             "properties": {
               "priority": 100,
               "sourceAddressPrefix": "[parameters('subnetPrefix')]",
+              "sourcePortRange": "*",
               "protocol": "*",
               "destinationPortRange": "*",
               "access": "Allow",
               "direction": "Outbound",
-              "sourcePortRange": "*",
-              "destinationAddressPrefix": "*"
-            }
-          },
-          {
-            "name": "ad8741",
-            "properties": {
-              "priority": 150,
-              "protocol": "Tcp",
-              "sourceAddressPrefix": "[parameters('subnetPrefix')]",
-              "sourcePortRange": "*",
-              "access": "Allow",
-              "direction": "Inbound",
-              "destinationPortRange": "8741",
-              "destinationAddressPrefix": "[parameters('subnetPrefix')]"
-            }
-          },
-          {
-            "name": "ad8300",
-            "properties": {
-              "priority": 151,
-              "protocol": "*",
-              "sourceAddressPrefix": "[parameters('subnetPrefix')]",
-              "sourcePortRange": "*",
-              "access": "Allow",
-              "direction": "Inbound",
-              "destinationPortRange": "8300-8302",
-              "destinationAddressPrefix": "[parameters('subnetPrefix')]"
-            }
-          },
-          {
-            "name": "ssh_host",
-            "properties": {
-              "priority": 200,
-              "sourceAddressPrefix": "*",
-              "protocol": "Tcp",
-              "destinationPortRange": "22",
-              "access": "Allow",
-              "direction": "Inbound",
-              "sourcePortRange": "*",
               "destinationAddressPrefix": "*"
             }
           },
           {
             "name": "ssh",
             "properties": {
-              "priority": 201,
+              "priority": 150,
               "sourceAddressPrefix": "*",
+              "sourcePortRange": "*",
               "protocol": "Tcp",
-              "destinationPortRange": "2222",
+              "destinationPortRange": "22",
               "access": "Allow",
               "direction": "Inbound",
-              "sourcePortRange": "*",
               "destinationAddressPrefix": "*"
             }
           },
           {
-            "name": "semp",
+            "name": "ConfluenSchemaRegistry",
             "properties": {
-              "priority": 202,
+              "priority": 160,
               "sourceAddressPrefix": "*",
+              "sourcePortRange": "*",
               "protocol": "Tcp",
-              "destinationPortRange": "8080",
+              "destinationPortRange": "8081",
               "access": "Allow",
               "direction": "Inbound",
-              "sourcePortRange": "*",
-              "destinationAddressPrefix": "*"
+              "destinationAddressPrefix": "[parameters('subnetPrefix')]"
             }
           },
           {
-            "name": "semptls",
+            "name": "KafkaConnect",
             "properties": {
-              "priority": 203,
-              "sourceAddressPrefix": "*",
+              "priority": 170,
               "protocol": "Tcp",
-              "destinationPortRange": "1943",
+              "sourceAddressPrefix": "*",
+              "sourcePortRange": "*",
               "access": "Allow",
               "direction": "Inbound",
-              "sourcePortRange": "*",
-              "destinationAddressPrefix": "*"
+              "destinationPortRange": "8083",
+              "destinationAddressPrefix": "[parameters('subnetPrefix')]"
             }
           },
           {
-            "name": "smf",
+            "name": "ConfluentKqsl",
             "properties": {
-              "priority": 204,
+              "priority": 180,
+              "protocol": "TCP",
               "sourceAddressPrefix": "*",
-              "protocol": "Tcp",
-              "destinationPortRange": "55555",
+              "sourcePortRange": "*",
               "access": "Allow",
               "direction": "Inbound",
-              "sourcePortRange": "*",
-              "destinationAddressPrefix": "*"
+              "destinationPortRange": "8088",
+              "destinationAddressPrefix": "[parameters('subnetPrefix')]"
             }
           },
           {
-            "name": "smf-compressed",
+            "name": "ConfluentControlCenter",
             "properties": {
-              "priority": 205,
+              "priority": 190,
               "sourceAddressPrefix": "*",
+              "sourcePortRange": "*",
               "protocol": "Tcp",
-              "destinationPortRange": "55003",
+              "destinationPortRange": "9021",
               "access": "Allow",
               "direction": "Inbound",
-              "sourcePortRange": "*",
-              "destinationAddressPrefix": "*"
+              "destinationAddressPrefix": "[parameters('subnetPrefix')]"
             }
           },
           {
-            "name": "smftls",
+            "name": "KafkaBroker",
             "properties": {
-              "priority": 206,
+              "priority": 199,
               "sourceAddressPrefix": "*",
+              "sourcePortRange": "*",
               "protocol": "Tcp",
-              "destinationPortRange": "55443",
+              "destinationPortRange": "9092",
               "access": "Allow",
               "direction": "Inbound",
-              "sourcePortRange": "*",
-              "destinationAddressPrefix": "*"
-            }
-          },
-          {
-            "name": "webservices",
-            "properties": {
-              "priority": 207,
-              "sourceAddressPrefix": "*",
-              "protocol": "Tcp",
-              "destinationPortRange": "8008",
-              "access": "Allow",
-              "direction": "Inbound",
-              "sourcePortRange": "*",
-              "destinationAddressPrefix": "*"
-            }
-          },
-          {
-            "name": "webtls",
-            "properties": {
-              "priority": 208,
-              "sourceAddressPrefix": "*",
-              "protocol": "Tcp",
-              "destinationPortRange": "1443",
-              "access": "Allow",
-              "direction": "Inbound",
-              "sourcePortRange": "*",
-              "destinationAddressPrefix": "*"
-            }
-          },
-          {
-            "name": "amqp",
-            "properties": {
-              "priority": 209,
-              "sourceAddressPrefix": "*",
-              "protocol": "Tcp",
-              "destinationPortRange": "5672",
-              "access": "Allow",
-              "direction": "Inbound",
-              "sourcePortRange": "*",
-              "destinationAddressPrefix": "*"
-            }
-          },
-          {
-            "name": "mqtt",
-            "properties": {
-              "priority": 210,
-              "sourceAddressPrefix": "*",
-              "protocol": "Tcp",
-              "destinationPortRange": "1883",
-              "access": "Allow",
-              "direction": "Inbound",
-              "sourcePortRange": "*",
-              "destinationAddressPrefix": "*"
-            }
-          },
-          {
-            "name": "mqttweb",
-            "properties": {
-              "priority": 211,
-              "sourceAddressPrefix": "*",
-              "protocol": "Tcp",
-              "destinationPortRange": "8000",
-              "access": "Allow",
-              "direction": "Inbound",
-              "sourcePortRange": "*",
-              "destinationAddressPrefix": "*"
-            }
-          },
-          {
-            "name": "rest",
-            "properties": {
-              "priority": 212,
-              "sourceAddressPrefix": "*",
-              "protocol": "Tcp",
-              "destinationPortRange": "9000",
-              "access": "Allow",
-              "direction": "Inbound",
-              "sourcePortRange": "*",
-              "destinationAddressPrefix": "*"
+              "destinationAddressPrefix": "[parameters('subnetPrefix')]"
             }
           }
         ]

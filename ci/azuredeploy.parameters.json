@@ -5,29 +5,17 @@
     "_artifactsLocation": {
       "value": "https://raw.githubusercontent.com/ARTIFACTSLOCATION/"
     },
-    "solaceEventBrokerDockerImageReference": {
-      "value": "solace/solace-pubsub-standard:latest"
-    },
     "vmAdminUsername": {
       "value": "travisadm"
     },
     "vmAdminPassword": {
       "value": "Travispwd1234!"
     },
-    "solaceAdminPassword": {
-      "value": "ADMINPASSWORD"
-    },
     "workspaceName": {
       "value": "traviswsUNIQUEID"
     },
-    "dnsLabelForLbIp": {
-      "value": "travislbUNIQUEID"
-    },
     "dataDiskSize": {
       "value": "20"
-    },
-    "deploymentModel": {
-      "value": "HighAvailability"
     }
   }
 }
