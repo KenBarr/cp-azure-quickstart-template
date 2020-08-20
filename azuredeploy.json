@@ -66,9 +66,9 @@
     },
     "cp-all-in-oneVmSize": {
       "type": "string",
-      "defaultValue": "Standard_D3_v2",
+      "defaultValue": "Standard_D4_v3",
       "metadata": {
-        "description": "The size of the Solace Message Routing Node VM. Requires at least 2 cores and 4GB of memory. Allowed values: D3_v2, DS3_v2, D3_v3, D3s_v3"
+        "description": "The size of the Solace Message Routing Node VM. Requires at least 4 cores and 16GB of memory. Allowed values: D3_v2, DS3_v2, D3_v3, D3s_v3"
       },
       "allowedValues": [
         "Standard_D3_v2",

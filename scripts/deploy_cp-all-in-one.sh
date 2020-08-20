@@ -127,12 +127,12 @@ tee /etc/systemd/system/cp-all-in-one.service <<-EOF
 EOF
 
 echo "`date` INFO: Start the cp-all-in-one containers"
-#systemctl daemon-reload
-#systemctl enable cp-all-in-one
-#systemctl start cp-all-in-one
+systemctl daemon-reload
+systemctl enable cp-all-in-one
+systemctl start cp-all-in-one
 
-cd /tmp/cp-all-in-one/cp-all-in-one/
-docker-compose up -d
+#cd /tmp/cp-all-in-one/cp-all-in-one/
+#docker-compose up -d
 
 echo "`date` INFO: Fixing advertised listeners"
 
