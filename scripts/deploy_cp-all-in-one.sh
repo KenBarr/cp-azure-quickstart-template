@@ -14,29 +14,21 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-#
-# This script will obtain the Solace message broker's docker image from
-# sources and installs and runs it in a docker container
-# solace_uri specifies where to get the docker image from
-# - default (not specified): PubSub+ Standard from docker hub
-# - Other public docker registry URI
-# - solace.com/download
-# - specified location of a docker image tarball URL
-#
-
-
 
 OPTIND=1         # Reset in case getopts has been used previously in the shell.
 
 # Initialize our own variables:
 location="eastus"
+seedFileULI="result.json"
 username="admin"
 workspace_id=""
-is_primary="false"
+
 
 while getopts "l:u:w:" opt; do
   case "$opt" in
   l)  location=$OPTARG
+    ;;
+  s)  seedFileULI=$OPTARG
     ;;
   u)  username=$OPTARG
     ;;
@@ -48,9 +40,10 @@ done
 shift $((OPTIND-1))
 [ "$1" = "--" ] && shift
 
-echo "`date` location=$location , username=$username , workspace_id=$workspace_id  , Leftovers: $@"
+echo "`date` location=$location , seedFileULI=$seedFileULI, $username=$username , workspace_id=$workspace_id  , Leftovers: $@"
 
 #Install the git jq for json parsing
+yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
 yum -y install git jq
 
 echo "`date` INFO: Validating Docker is up and running"
@@ -147,9 +140,17 @@ while [ ${loop_count} != ${loop_guard} ]; do
     sleep 30
   else
     echo "`date` INFO: Kafka Broker is running"
-    docker exec broker "sed" "-i" "s/localhost/${HOSTNAME},${HOSTNAME}.${location}.cloudapp.azure.com/" "/etc/kafka/kafka.properties"
+    docker exec broker "sed" "-i" "s/localhost/${HOSTNAME}.${location}.cloudapp.azure.com/" "/etc/kafka/kafka.properties"
     break
   fi
 done
 
+chmod +x ./populate_kafka.sh
+IFS='/'
+read -ra SEED_FILE_URL <<< "$seedFileULI"
+SEED_FILE_INDEX=`echo ${#SEED_FILE_URL[@]}`
+((SEED_FILE_INDEX--))
+SEED_FILE=${SEED_FILE_URL[${SEED_FILE_INDEX}]}
+
+./populate_kafka.sh -f ./${SEED_FILE}
 echo "`date` INFO: cp-all-in-one bringup complete"

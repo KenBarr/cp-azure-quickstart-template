@@ -92,6 +92,13 @@
         "240"
       ]
     },
+    "seedFile": {
+      "type": "string",
+      "defaultValue": "https://raw.githubusercontent.com/KenBarr/pubsubplus-azure-quickstart-template/master/scripts/result.json",
+      "metadata": {
+        "description": "The discovery files used to populate Kafka cluster"
+      }
+    },
     "existingVirtualNetworkName": {
       "type": "string",
       "defaultValue": "",
@@ -158,6 +165,8 @@
     "scriptsLocation": "scripts/",
     "cp-all-in-oneInstallScriptName": "deploy_cp-all-in-one.sh",
     "cp-all-in-oneInstallScriptFileUri": "[uri(parameters('_artifactsLocation'), concat(variables('scriptsLocation'), variables('cp-all-in-oneInstallScriptName'), parameters('_artifactsLocationSasToken')))]",
+    "cp-all-in-onePopulateScriptName": "populate.sh",
+    "cp-all-in-onePopulateScriptFileUri": "[uri(parameters('_artifactsLocation'), concat(variables('scriptsLocation'), variables('cp-all-in-onePopulateScriptName'), parameters('_artifactsLocationSasToken')))]",
     "publicIPAddressName": "myPublicIPD",
     "publicIPAddressType": "Dynamic",
     "virtualNetworkName": "[if(not(empty(parameters('existingVirtualNetworkName'))), parameters('existingVirtualNetworkName'), 'solace-vnet')]",
@@ -422,11 +431,13 @@
         "autoUpgradeMinorVersion": true,
         "settings": {
           "fileUris": [
-            "[variables('cp-all-in-oneInstallScriptFileUri')]"
+            "[variables('cp-all-in-oneInstallScriptFileUri')]",
+            "[variables('cp-all-in-onePopulateScriptFileUri')]",
+            "[parameters('seedFile')]"
           ]
         },
         "protectedSettings": {
-          "commandToExecute": "[concat('bash ', variables('cp-all-in-oneInstallScriptName'), ' -l ',  parameters('location'), '-u ', parameters('vmAdminUsername'), if(empty(parameters('workspaceName')), '', concat(' -w ', reference(variables('solaceWorkspaceName')).outputs.workspaceId.value)))]"
+          "commandToExecute": "[concat('bash ', variables('cp-all-in-oneInstallScriptName'), ' -s ', parameters('seedFile'), ' -l ',  parameters('location'), '-u ', parameters('vmAdminUsername'), if(empty(parameters('workspaceName')), '', concat(' -w ', reference(variables('solaceWorkspaceName')).outputs.workspaceId.value)))]"
          }
       }
     }
