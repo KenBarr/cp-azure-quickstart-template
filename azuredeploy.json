@@ -127,7 +127,7 @@
         "description": "Location for all resources. Default will use the same location as the Resource Group."
       }
     },
-    "seedFile": {
+    "seedFileURI": {
       "type": "string",
       "defaultValue": "https://raw.githubusercontent.com/KenBarr/pubsubplus-azure-quickstart-template/master/scripts/result.json",
       "metadata": {
@@ -165,7 +165,7 @@
     "scriptsLocation": "scripts/",
     "cp-all-in-oneInstallScriptName": "deploy_cp-all-in-one.sh",
     "cp-all-in-oneInstallScriptFileUri": "[uri(parameters('_artifactsLocation'), concat(variables('scriptsLocation'), variables('cp-all-in-oneInstallScriptName'), parameters('_artifactsLocationSasToken')))]",
-    "cp-all-in-onePopulateScriptName": "populate.sh",
+    "cp-all-in-onePopulateScriptName": "populate_kafka.sh",
     "cp-all-in-onePopulateScriptFileUri": "[uri(parameters('_artifactsLocation'), concat(variables('scriptsLocation'), variables('cp-all-in-onePopulateScriptName'), parameters('_artifactsLocationSasToken')))]",
     "publicIPAddressName": "myPublicIPD",
     "publicIPAddressType": "Dynamic",
@@ -433,11 +433,11 @@
           "fileUris": [
             "[variables('cp-all-in-oneInstallScriptFileUri')]",
             "[variables('cp-all-in-onePopulateScriptFileUri')]",
-            "[parameters('seedFile')]"
+            "[parameters('seedFileURI')]"
           ]
         },
         "protectedSettings": {
-          "commandToExecute": "[concat('bash ', variables('cp-all-in-oneInstallScriptName'), ' -s ', parameters('seedFile'), ' -l ',  parameters('location'), '-u ', parameters('vmAdminUsername'), if(empty(parameters('workspaceName')), '', concat(' -w ', reference(variables('solaceWorkspaceName')).outputs.workspaceId.value)))]"
+          "commandToExecute": "[concat('bash ', variables('cp-all-in-oneInstallScriptName'), ' -s ', parameters('seedFileURI'), ' -l ',  parameters('location'), '-u ', parameters('vmAdminUsername'), if(empty(parameters('workspaceName')), '', concat(' -w ', reference(variables('solaceWorkspaceName')).outputs.workspaceId.value)))]"
          }
       }
     }
