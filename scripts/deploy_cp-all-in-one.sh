@@ -42,6 +42,9 @@ shift $((OPTIND-1))
 
 echo "`date` location=$location , seedFileULI=$seedFileULI, $username=$username , workspace_id=$workspace_id  , Leftovers: $@"
 
+home_dir=$PWD
+echo "Starting in directy ${home_dir}"
+
 #Install the git jq for json parsing
 yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
 yum -y install git jq
@@ -144,6 +147,8 @@ while [ ${loop_count} != ${loop_guard} ]; do
     break
   fi
 done
+
+cd $home_dir
 
 chmod +x ./populate_kafka.sh
 IFS='/'

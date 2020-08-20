@@ -92,13 +92,6 @@
         "240"
       ]
     },
-    "seedFile": {
-      "type": "string",
-      "defaultValue": "https://raw.githubusercontent.com/KenBarr/pubsubplus-azure-quickstart-template/master/scripts/result.json",
-      "metadata": {
-        "description": "The discovery files used to populate Kafka cluster"
-      }
-    },
     "existingVirtualNetworkName": {
       "type": "string",
       "defaultValue": "",
@@ -132,6 +125,13 @@
       "defaultValue": "[resourceGroup().location]",
       "metadata": {
         "description": "Location for all resources. Default will use the same location as the Resource Group."
+      }
+    },
+    "seedFile": {
+      "type": "string",
+      "defaultValue": "https://raw.githubusercontent.com/KenBarr/pubsubplus-azure-quickstart-template/master/scripts/result.json",
+      "metadata": {
+        "description": "The discovery files used to populate Kafka cluster"
       }
     },
     "_artifactsLocation": {
