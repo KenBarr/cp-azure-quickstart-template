@@ -129,7 +129,7 @@
     },
     "seedFileURI": {
       "type": "string",
-      "defaultValue": "https://raw.githubusercontent.com/KenBarr/pubsubplus-azure-quickstart-template/master/scripts/result.json",
+      "defaultValue": "https://raw.githubusercontent.com/KenBarr/cp-azure-quickstart-template/master/scripts/result.json",
       "metadata": {
         "description": "The discovery files used to populate Kafka cluster"
       }
@@ -139,7 +139,7 @@
       "metadata": {
         "description": "The base URI where artifacts required by this template are located."
       },
-      "defaultValue": "https://raw.githubusercontent.com/kenbarr/pubsubplus-azure-quickstart-template/master/"
+      "defaultValue": "https://raw.githubusercontent.com/kenbarr/cp-azure-quickstart-template/master/"
     },
     "_artifactsLocationSasToken": {
       "type": "securestring",
