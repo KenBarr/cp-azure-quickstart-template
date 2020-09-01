@@ -19,10 +19,23 @@ OPTIND=1         # Reset in case getopts has been used previously in the shell.
 
 # Initialize our own variables:
 discovery_file="./result.json"
+schema_reg_ip="localhost"
+schema_reg_port="8081"
+kafka_ip="localhost"
+kafka_port="9092"
 
-while getopts "f:" opt; do
+
+while getopts "f:i:k:p:q:" opt; do
   case "$opt" in
   f)  discovery_file=$OPTARG
+    ;;
+  i)  schema_reg_ip=$OPTARG
+    ;;
+  k)  kafka_ip=$OPTARG
+    ;;
+  p)  schema_reg_port=$OPTARG
+    ;;
+  q)  kafka_port=$OPTARG
     ;;
   esac
 done
@@ -30,13 +43,14 @@ done
 shift $((OPTIND-1))
 [ "$1" = "--" ] && shift
 
-echo "`date` discovery_file=$discovery_file ,  Leftovers: $@"
+echo "`date` discovery_file=$discovery_file , schema_reg_ip=$schema_reg_ip,  schema_reg_port=$schema_reg_port, \
+             kafka_ip=$kafka_ip, kafka_port=$kafka_port, Leftovers: $@"
 
 
 TOPICS=`jq < ${discovery_file} .data.events.topics[] | sed 's/"//g'`
 for topic in $TOPICS
 do
- docker exec -t broker /usr/bin/kafka-topics --bootstrap-server localhost:9092 --create --topic ${topic}
+ docker exec -t broker /usr/bin/kafka-topics --bootstrap-server ${kafka_ip}:${kafka_port} --create --topic ${topic}
  #docker exec -t broker /usr/bin/kafka-producer-perf-test --producer-props bootstrap.servers=localhost:9092 --topic ${topic} --num-records 100 --throughput -1 --record-size 100   
 done
 
@@ -55,7 +69,7 @@ do
   schema_name=`echo ${schema} | jq .name`
   curl -X POST -H "Content-Type: application/vnd.schemaregistry.v1+json" \
    --data "{\"schema\": ${schema_content}}" \
-   http://localhost:8081/subjects/${topic}-value/versions
+   http://${schema_reg_ip}:${chema_reg_port}/subjects/${topic}-value/versions
    ((count++))
 done
 
@@ -69,6 +83,6 @@ do
   if [ "$consumerGroup" == "null" ]; then
     break
   fi
-   docker exec -t broker /usr/bin/kafka-consumer-perf-test --bootstrap-server localhost:9092 --topic ${topic} --group ${consumerGroup} --messages 1 --timeout 10
+   docker exec -t broker /usr/bin/kafka-consumer-perf-test --bootstrap-server ${kafka_ip}:${kafka_port} --topic ${topic} --group ${consumerGroup} --messages 1 --timeout 10
   ((count++))
 done
