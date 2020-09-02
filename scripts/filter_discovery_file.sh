@@ -70,13 +70,24 @@ done < "$input_file"
 echo "`date` Put filtered Topics into:$output_file"
 add_section ${output_file} "topics" ${topic_array[@]}
 
-#[TODO]  Here I am relying on jq to deduplicate objects
 echo "`date` Put filtered Connectors into:$output_file"
 if (( ${#associatedConnectors[@]} > 0 )); then
+    # Populate the known connectorNamesList with patterMatchedConnectors
+    connectorNamesList=""
+    for connector in ${patterMatchedConnectors[@]}
+    do  
+        connectorNamesList="$connectorNamesList `echo ${connector} | jq .name`"
+    done
     for connector in ${associatedConnectors[@]}
     do
         connectorName=`echo $connector | jq .connector`
-        newConnector=`echo $totalConnectors | jq ".[] | select(.name == ${connectorName}) | ." `
+        # Prevent adding duplicate connectors
+        if echo $connectorNamesList | grep -w $connectorName > /dev/null; then
+            continue
+        else
+            connectorNamesList="${connectorNamesList} ${connectorName}"
+        fi
+        newConnector=`echo $totalConnectors | jq ".[] | select(.name == ${connectorName}) | ." | tr -d ' ' | tr -d '\r' | tr -d '\n'`
         patterMatchedConnectors+=(${newConnector})
     done
 fi
@@ -84,10 +95,22 @@ add_section ${output_file} "connectors" ${patterMatchedConnector[@]}
 
 echo "`date` Put filtered ConsumerGroups into:$output_file"
 if (( ${#associatedConsumerGroups[@]} > 0 )); then
+    # Populate the known consumerGroupNamesList with patterMatchedConsumerGroup
+    consumerGroupNameList=""
+    for consumerGroup in ${patterMatchedConsumerGroups[@]}
+    do  
+        consumerGroupNameList="$consumerGroupNameList `echo ${consumerGroup} | jq .groupId`"
+    done
     for consumerGroup in ${associatedConsumerGroups[@]}
     do
         consumerGroupName=`echo $consumerGroup | jq .consumerGroup`
-        newConsumerGroup=`echo $totalConsumerGroups | jq ".[] | select(.name == ${consumerGroupName}) | ." `
+        # Prevent adding duplicate connectors
+        if echo $consumerGroupNameList | grep -w $consumerGroupName > /dev/null; then
+            continue
+        else
+            consumerGroupNameList="${consumerGroupNameList} ${consumerGroupName}"
+        fi
+        newConsumerGroup=`echo $totalConsumerGroups | jq ".[] | select(.groupId == ${consumerGroupName}) | ." | tr -d ' ' | tr -d '\r' | tr -d '\n'`
         patterMatchedConsumerGroups+=(${newConsumerGroup})
     done
 fi
@@ -95,13 +118,31 @@ add_section ${output_file} "consumerGroups" ${patterMatchedConsumerGroups[@]}
 
 echo "`date` Put filtered Schemas into:$output_file"
 if (( ${#associatedSchemas[@]} > 0 )); then
+    # Populate the known schemaIdList with patterMatchedSchemas
+    schemaIdList=""
+    for schema in ${patterMatchedSchemas[@]}
+    do  
+        schemaIdList="$schemaIdList `echo ${schema} | jq .schemaId`"
+    done
     for schema in ${associatedSchemas[@]}
     do
         schemaName=`echo $schema | jq .schemaId`
+        # Prevent adding duplicate connectors
+        if echo $schemaIdList | grep -w $schemaName > /dev/null; then
+            continue
+        else
+            schemaIdList="${schemaIdList} ${schemaName}"
+        fi
         newSchema=`echo $totalSchemas | jq ".[] | select(.schemaId == ${schemaName}) | ." | tr -d ' ' | tr -d '\r' | tr -d '\n'`
         patterMatchedSchemas+=(${newSchema})
         keySchemaName=`echo $schema | jq .keySchemaId`
         if [[ ${keySchemaName} != "null" ]]; then
+            # Prevent adding duplicate connectors
+            if echo $schemaIdList | grep -w $keySchemaName > /dev/null; then
+                continue
+            else
+                schemaIdList="${schemaIdList} ${keySchemaName}"
+            fi        
             keySchema=`echo $totalSchemas | jq ".[] | select(.schemaId == ${keySchemaName}) | ." | tr -d ' ' | tr -d '\r' | tr -d '\n'`
             patterMatchedSchemas+=(${keySchema})
         fi
