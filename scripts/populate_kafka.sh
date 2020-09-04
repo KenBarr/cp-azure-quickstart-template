@@ -18,15 +18,19 @@
 OPTIND=1         # Reset in case getopts has been used previously in the shell.
 
 # Initialize our own variables:
+cert_file=""
 discovery_file="./result.json"
 schema_reg_ip="localhost"
 schema_reg_port="8081"
 kafka_ip="localhost"
 kafka_port="9092"
+run_local="true"
 
 
-while getopts "f:i:k:p:q:" opt; do
+while getopts "c:f:i:k:p:q:r:" opt; do
   case "$opt" in
+  c)  cert_file=$OPTARG
+    ;;
   f)  discovery_file=$OPTARG
     ;;
   i)  schema_reg_ip=$OPTARG
@@ -37,21 +41,28 @@ while getopts "f:i:k:p:q:" opt; do
     ;;
   q)  kafka_port=$OPTARG
     ;;
+  r)  run_local=$OPTARG
+    ;;
   esac
 done
 
 shift $((OPTIND-1))
 [ "$1" = "--" ] && shift
 
-echo "`date` discovery_file=$discovery_file , schema_reg_ip=$schema_reg_ip,  schema_reg_port=$schema_reg_port, \
-             kafka_ip=$kafka_ip, kafka_port=$kafka_port, Leftovers: $@"
+echo "`date` cert_file=$cert_file, discovery_file=$discovery_file , schema_reg_ip=$schema_reg_ip,  schema_reg_port=$schema_reg_port, \
+             kafka_ip=$kafka_ip, kafka_port=$kafka_port, run_local=$run_local Leftovers: $@"
 
 
 TOPICS=`jq < ${discovery_file} .data.events.topics[] | sed 's/"//g'`
 for topic in $TOPICS
 do
- docker exec -t broker /usr/bin/kafka-topics --bootstrap-server ${kafka_ip}:${kafka_port} --create --topic ${topic}
- #docker exec -t broker /usr/bin/kafka-producer-perf-test --producer-props bootstrap.servers=localhost:9092 --topic ${topic} --num-records 100 --throughput -1 --record-size 100   
+  if [[ $run_local == "true" ]]; then
+    #docker exec -t broker /usr/bin/kafka-topics --bootstrap-server ${kafka_ip}:${kafka_port} --create --topic ${topic}
+    docker exec -t broker /usr/bin/kafka-producer-perf-test --producer-props bootstrap.servers=localhost:9092 --topic ${topic} --num-records 1 --throughput -1 --record-size 100 
+  else
+    #ssh -i ${cert_file} ec2-user@${kafka_ip} docker exec -t broker /usr/bin/kafka-topics --bootstrap-server ${kafka_ip}:${kafka_port} --create --topic ${topic}
+    ssh -i ${cert_file} ec2-user@${kafka_ip} docker exec -t broker /usr/bin/kafka-producer-perf-test --producer-props bootstrap.servers=localhost:9092 --topic ${topic} --num-records 1 --throughput -1 --record-size 100 
+  fi
 done
 
 count=0
@@ -83,6 +94,10 @@ do
   if [ "$consumerGroup" == "null" ]; then
     break
   fi
-   docker exec -t broker /usr/bin/kafka-consumer-perf-test --bootstrap-server ${kafka_ip}:${kafka_port} --topic ${topic} --group ${consumerGroup} --messages 1 --timeout 10
+  if [[ $run_local == "true" ]]; then
+    docker exec -t broker /usr/bin/kafka-consumer-perf-test --bootstrap-server ${kafka_ip}:${kafka_port} --topic ${topic} --group ${consumerGroup} --messages 1 --timeout 10
+  else
+    ssh -i ${cert_file} ec2-user@${kafka_ip} docker exec -t broker /usr/bin/kafka-consumer-perf-test --bootstrap-server ${kafka_ip}:${kafka_port} --topic ${topic} --group ${consumerGroup} --messages 1 --timeout 10
+  fi
   ((count++))
 done
