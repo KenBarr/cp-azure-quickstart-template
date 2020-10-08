@@ -52,7 +52,7 @@ shift $((OPTIND-1))
 echo "`date` cert_file=$cert_file, discovery_file=$discovery_file , schema_reg_ip=$schema_reg_ip,  schema_reg_port=$schema_reg_port, \
              kafka_ip=$kafka_ip, kafka_port=$kafka_port, run_local=$run_local Leftovers: $@"
 
-
+# Create any topics and add a single message so tht consumers can be registered.
 TOPICS=`jq < ${discovery_file} .data.events.topics[] | sed 's/"//g'`
 for topic in $TOPICS
 do
@@ -65,6 +65,26 @@ do
   fi
 done
 
+# Create consumer-groups and consume messages to move off-set past test message
+count=0
+run=1
+while [ $run -eq 1 ]
+do
+  consumerGroup=`jq < ${discovery_file} .data.events.consumerGroupToTopicAssociations[${count}].consumerGroup | sed 's/"//g'`
+  topic=`jq < ${discovery_file} .data.events.consumerGroupToTopicAssociations[${count}].topic | sed 's/"//g'`
+  echo "ConsumerGroup: ${count} = ${consumerGroup} Topic = ${topic}"
+  if [ "$consumerGroup" == "null" ]; then
+    break
+  fi
+  if [[ $run_local == "true" ]]; then
+    docker exec -t broker /usr/bin/kafka-consumer-perf-test --bootstrap-server ${kafka_ip}:${kafka_port} --topic ${topic} --group ${consumerGroup} --messages 1 --timeout 100
+  else
+    ssh -i ${cert_file} ec2-user@${kafka_ip} docker exec -t broker /usr/bin/kafka-consumer-perf-test --bootstrap-server ${kafka_ip}:${kafka_port} --topic ${topic} --group ${consumerGroup} --messages 1 --timeout 100
+  fi
+  ((count++))
+done
+
+# Add any schema's to the topics
 count=0
 run=1
 while [ $run -eq 1 ]
@@ -82,22 +102,4 @@ do
    --data "{\"schema\": ${schema_content}}" \
    http://${schema_reg_ip}:${chema_reg_port}/subjects/${topic}-value/versions
    ((count++))
-done
-
-count=0
-run=1
-while [ $run -eq 1 ]
-do
-  consumerGroup=`jq < ${discovery_file} .data.events.consumerGroupToTopicAssociations[${count}].consumerGroup | sed 's/"//g'`
-  topic=`jq < ${discovery_file} .data.events.consumerGroupToTopicAssociations[${count}].topic | sed 's/"//g'`
-  echo "ConsumerGroup: ${count} = ${consumerGroup} Topic = ${topic}"
-  if [ "$consumerGroup" == "null" ]; then
-    break
-  fi
-  if [[ $run_local == "true" ]]; then
-    docker exec -t broker /usr/bin/kafka-consumer-perf-test --bootstrap-server ${kafka_ip}:${kafka_port} --topic ${topic} --group ${consumerGroup} --messages 1 --timeout 10
-  else
-    ssh -i ${cert_file} ec2-user@${kafka_ip} docker exec -t broker /usr/bin/kafka-consumer-perf-test --bootstrap-server ${kafka_ip}:${kafka_port} --topic ${topic} --group ${consumerGroup} --messages 1 --timeout 10
-  fi
-  ((count++))
 done
